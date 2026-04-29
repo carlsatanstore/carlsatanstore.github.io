@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vortex Bootleg Factory</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=Playfair+Display:ital,wght@1,400;1,700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--black:#0a0a0a;--white:#f2ede6;--red:#c8001e;--grey:#1e1e1e;--mid:#3a3a3a;--muted:#888;}
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--black);color:var(--white);font-family:'DM Mono',monospace;overflow-x:hidden;}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");opacity:.025;pointer-events:none;z-index:9999;}
+
+    /* NAV */
+    nav{display:flex;align-items:center;justify-content:space-between;padding:24px 48px;border-bottom:1px solid var(--grey);position:sticky;top:0;background:rgba(10,10,10,.96);backdrop-filter:blur(8px);z-index:100;}
+    .nav-back{display:flex;flex-direction:column;line-height:1;text-decoration:none;}
+    .nav-back .band{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:.08em;color:var(--white);}
+    .nav-back .sub{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+    .nav-links{display:flex;gap:24px;list-style:none;}
+    .nav-links a{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s;}
+    .nav-links a:hover{color:var(--white);}
+
+    /* HERO */
+    .hero{padding:80px 48px 64px;border-bottom:1px solid var(--grey);}
+    .hero-tag{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--red);margin-bottom:16px;}
+    .hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,120px);line-height:.88;letter-spacing:.02em;margin-bottom:24px;}
+    .hero-title em{font-family:'Playfair Display',serif;font-style:italic;color:var(--red);}
+    .hero-desc{font-size:13px;line-height:2;color:rgba(242,237,230,.6);max-width:600px;letter-spacing:.02em;}
+    .hero-desc strong{color:var(--white);}
+
+    /* GRID */
+    .bootleg-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+      gap:1px;
+      background:var(--grey);
+      border-top:1px solid var(--grey);
+      border-bottom:1px solid var(--grey);
+    }
+
+    /* CARD */
+    .bootleg-card{
+      background:var(--black);
+      cursor:pointer;
+      transition:background .2s;
+    }
+    .bootleg-card:hover{background:#111;}
+    .bootleg-thumb{
+      position:relative;
+      aspect-ratio:16/9;
+      overflow:hidden;
+      background:#111;
+    }
+    .bootleg-thumb img{
+      width:100%;height:100%;object-fit:cover;display:block;
+      transition:transform .5s ease,filter .3s;
+      filter:grayscale(30%);
+    }
+    .bootleg-card:hover .bootleg-thumb img{transform:scale(1.04);filter:grayscale(0%);}
+    .play-btn{
+      position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+      width:52px;height:52px;border-radius:50%;
+      background:rgba(200,0,30,.85);
+      display:flex;align-items:center;justify-content:center;
+      font-size:18px;color:var(--white);
+      transition:transform .2s,background .2s;
+      padding-left:4px;
+    }
+    .bootleg-card:hover .play-btn{transform:translate(-50%,-50%) scale(1.1);background:var(--red);}
+    .bootleg-info{padding:20px 24px 28px;border-top:1px solid var(--grey);}
+    .bootleg-tag{font-size:8px;letter-spacing:.25em;text-transform:uppercase;color:var(--red);margin-bottom:6px;}
+    .bootleg-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.04em;color:var(--white);line-height:1.2;}
+
+    /* VIDEO MODAL */
+    .video-overlay{
+      display:none;position:fixed;inset:0;
+      background:rgba(0,0,0,.95);z-index:2000;
+      align-items:center;justify-content:center;flex-direction:column;
+    }
+    .video-overlay.open{display:flex;}
+    .video-close{
+      position:fixed;top:16px;right:20px;
+      background:none;border:none;color:var(--muted);
+      font-size:28px;cursor:pointer;z-index:2001;line-height:1;
+    }
+    .video-wrap{
+      width:min(900px,90vw);
+      aspect-ratio:16/9;
+      position:relative;
+    }
+    .video-wrap iframe{width:100%;height:100%;border:none;}
+    .video-title-bar{
+      width:min(900px,90vw);
+      padding:16px 0 0;
+      font-size:10px;letter-spacing:.15em;text-transform:uppercase;
+      color:var(--muted);
+    }
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--grey);padding:40px 48px;display:flex;justify-content:space-between;align-items:center;}
+    footer p{font-size:9px;letter-spacing:.12em;color:var(--muted);text-transform:uppercase;}
+    footer a{color:var(--muted);text-decoration:none;}
+    footer a:hover{color:var(--white);}
+
+    @media(max-width:700px){
+      nav{padding:14px 20px;}
+      .nav-links a{font-size:8px;}
+      .hero{padding:48px 24px 40px;}
+      footer{flex-direction:column;gap:12px;text-align:center;padding:32px 20px;}
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-back" href="index.html">
+    <span class="band">Carl Satan</span>
+    <span class="sub">← Voltar à Loja</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="sobre.html">Sobre</a></li>
+    <li><a href="index.html">Loja</a></li>
+    <li><a href="https://www.youtube.com/@VortexBootlegFactory/videos" target="_blank">Canal ↗</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-tag">Vortex Bootleg Factory</p>
+  <h1 class="hero-title">Gravações<br>do <em>Circuito.</em></h1>
+  <p class="hero-desc">
+    A <strong>Vortex Bootleg Factory</strong> registra e publica shows do circuito de música independente
+    com o intuito de registro histórico, divulgação musical e resgate da cultura analógica de compartilhamento.
+    Carl Satan e as bandas da cena.
+  </p>
+</section>
+
+<!-- GRID -->
+<div class="bootleg-grid">
+
+  <div class="bootleg-card" onclick="openBootleg('19mRAX4KyVI', '612', this)">
+    <div class="bootleg-thumb">
+      <img src="https://img.youtube.com/vi/19mRAX4KyVI/hqdefault.jpg" alt="Bootleg 1" loading="lazy"/>
+      <div class="play-btn">▶</div>
+      <div class="bootleg-duration"></div>
+    </div>
+    <div class="bootleg-info">
+      <p class="bootleg-tag">Bootleg #01</p>
+      <h3 class="bootleg-title">Nicolas Não Tem Banda Ao Vivo 29/08/2023 @ Associação Cultural Cecília</h3>
+    </div>
+  </div>
+  <div class="bootleg-card" onclick="openBootleg('nCEPA-5UnQA', '1156', this)">
+    <div class="bootleg-thumb">
+      <img src="https://img.youtube.com/vi/nCEPA-5UnQA/hqdefault.jpg" alt="Bootleg 2" loading="lazy"/>
+      <div class="play-btn">▶</div>
+      <div class="bootleg-duration"></div>
+    </div>
+    <div class="bootleg-info">
+      <p class="bootleg-tag">Bootleg #02</p>
+      <h3 class="bootleg-title">Otis Trio & Carol Cavesso Ao Vivo 29/08/2023 @ Associação Cultural Cecilia</h3>
+    </div>
+  </div>
+  <div class="bootleg-card" onclick="openBootleg('hsDpk5ZrPLA', '3702', this)">
+    <div class="bootleg-thumb">
+      <img src="https://img.youtube.com/vi/hsDpk5ZrPLA/hqdefault.jpg" alt="Bootleg 3" loading="lazy"/>
+      <div class="play-btn">▶</div>
+      <div class="bootleg-duration"></div>
+    </div>
+    <div class="bootleg-info">
+      <p class="bootleg-tag">Bootleg #03</p>
+      <h3 class="bootleg-title">Thandi Ntuli Live @ Sesc Pompeia 20/10/23</h3>
+    </div>
+  </div>
+  <div class="bootleg-card" onclick="openBootleg('XVgCdhYoCik', '2694', this)">
+    <div class="bootleg-thumb">
+      <img src="https://img.youtube.com/vi/XVgCdhYoCik/hqdefault.jpg" alt="Bootleg 4" loading="lazy"/>
+      <div class="play-btn">▶</div>
+      <div class="bootleg-duration"></div>
+    </div>
+    <div class="bootleg-info">
+      <p class="bootleg-tag">Bootleg #04</p>
+      <h3 class="bootleg-title">Sona Jobarteh live @ Sesc 14Bis 27/10/2023</h3>
+    </div>
+  </div>
+  <div class="bootleg-card" onclick="openBootleg('YG1zNbnJwJY', '931', this)">
+    <div class="bootleg-thumb">
+      <img src="https://img.youtube.com/vi/YG1zNbnJwJY/hqdefault.jpg" alt="Bootleg 5" loading="lazy"/>
+      <div class="play-btn">▶</div>
+      <div class="bootleg-duration"></div>
+    </div>
+    <div class="bootleg-info">
+      <p class="bootleg-tag">Bootleg #05</p>
+      <h3 class="bootleg-title">Monch Monch Ao Vivo 22/09/23 @ A Porta Maldita</h3>
+    </div>
+  </div>
+  <div class="bootleg-card" onclick="openBootleg('qFQcImtzLMA', '1986', this)">
+    <div class="bootleg-thumb">
+      <img src="https://img.youtube.com/vi/qFQcImtzLMA/hqdefault.jpg" alt="Bootleg 6" loading="lazy"/>
+      <div class="play-btn">▶</div>
+      <div class="bootleg-duration"></div>
+    </div>
+    <div class="bootleg-info">
+      <p class="bootleg-tag">Bootleg #06</p>
+      <h3 class="bootleg-title">Jonnata Doll e os Garotos Solventes Ao Vivo 14/11/23 @ Porão da Cerveja</h3>
+    </div>
+  </div>
+  <div class="bootleg-card" onclick="openBootleg('hau3F4BmATA', '413', this)">
+    <div class="bootleg-thumb">
+      <img src="https://img.youtube.com/vi/hau3F4BmATA/hqdefault.jpg" alt="Bootleg 7" loading="lazy"/>
+      <div class="play-btn">▶</div>
+      <div class="bootleg-duration"></div>
+    </div>
+    <div class="bootleg-info">
+      <p class="bootleg-tag">Bootleg #07</p>
+      <h3 class="bootleg-title" style="color:var(--red);">Carl Satan Ao Vivo 01/12/24 @ FFFRONT</h3>
+    </div>
+  </div>
+  <div class="bootleg-card" onclick="openBootleg('JhQSeDYKwxE', '861', this)">
+    <div class="bootleg-thumb">
+      <img src="https://img.youtube.com/vi/JhQSeDYKwxE/hqdefault.jpg" alt="Bootleg 8" loading="lazy"/>
+      <div class="play-btn">▶</div>
+      <div class="bootleg-duration"></div>
+    </div>
+    <div class="bootleg-info">
+      <p class="bootleg-tag">Bootleg #08</p>
+      <h3 class="bootleg-title">Quarteta Ao Vivo 01/12/24 @ FFFRONT</h3>
+    </div>
+  </div>
+  <div class="bootleg-card" onclick="openBootleg('ztTba9nY8pg', '958', this)">
+    <div class="bootleg-thumb">
+      <img src="https://img.youtube.com/vi/ztTba9nY8pg/hqdefault.jpg" alt="Bootleg 9" loading="lazy"/>
+      <div class="play-btn">▶</div>
+      <div class="bootleg-duration"></div>
+    </div>
+    <div class="bootleg-info">
+      <p class="bootleg-tag">Bootleg #09</p>
+      <h3 class="bootleg-title">Zezza Vic & Os Cães do Inferno Ao Vivo 08/12/24 @ Cafundó</h3>
+    </div>
+  </div>
+  <div class="bootleg-card" onclick="openBootleg('XSLMKXD9YI4', '1309', this)">
+    <div class="bootleg-thumb">
+      <img src="https://img.youtube.com/vi/XSLMKXD9YI4/hqdefault.jpg" alt="Bootleg 10" loading="lazy"/>
+      <div class="play-btn">▶</div>
+      <div class="bootleg-duration"></div>
+    </div>
+    <div class="bootleg-info">
+      <p class="bootleg-tag">Bootleg #10</p>
+      <h3 class="bootleg-title">Porno Massacre Ao Vivo 08/12/24 @ Cafundó</h3>
+    </div>
+  </div>
+  <div class="bootleg-card" onclick="openBootleg('mFURJwaAegk', '10', this)">
+    <div class="bootleg-thumb">
+      <img src="https://img.youtube.com/vi/mFURJwaAegk/hqdefault.jpg" alt="Bootleg 11" loading="lazy"/>
+      <div class="play-btn">▶</div>
+      <div class="bootleg-duration"></div>
+    </div>
+    <div class="bootleg-info">
+      <p class="bootleg-tag">Bootleg #11</p>
+      <h3 class="bootleg-title">Cão Ao Vivo 12/12/24 @ Entr3posto</h3>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2026 Carl Satan · Vortex Bootleg Factory</p>
+  <p><a href="https://www.youtube.com/@VortexBootlegFactory/videos" target="_blank">Ver canal completo ↗</a></p>
+</footer>
+
+<!-- VIDEO MODAL -->
+<div class="video-overlay" id="video-overlay" onclick="if(event.target===this)closeVideo()">
+  <button class="video-close" onclick="closeVideo()">✕</button>
+  <div class="video-wrap">
+    <iframe id="video-frame" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  </div>
+  <p class="video-title-bar" id="video-title-bar"></p>
+</div>
+
+<script>
+  function openBootleg(id, t, card) {
+    var title = card.querySelector('.bootleg-title').textContent;
+    document.getElementById('video-frame').src =
+      'https://www.youtube.com/embed/' + id + '?start=' + t + '&autoplay=1';
+    document.getElementById('video-title-bar').textContent = title !== '—' ? title : '';
+    document.getElementById('video-overlay').classList.add('open');
+  }
+  function closeVideo() {
+    document.getElementById('video-frame').src = '';
+    document.getElementById('video-overlay').classList.remove('open');
+  }
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeVideo();
+  });
+</script>
+</body>
+</html>
